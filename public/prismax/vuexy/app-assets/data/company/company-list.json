@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name_company": "PT MITRA AKSES GLOBALINDO",
+      "pic_name": "John Doe",
+      "username": "gslixby0",
+      "pic_email": "gslixby0@abc.net.au",
+      "pic_contact": "41141",
+      "address_company": "JALANAN",
+      "avatar": "10.png"
+    },
+    {
+      "id": 2,
+      "name_company": "PT MITRA AKSES GLOBALINDO",
+      "pic_name": "John Doe",
+      "username": "gslixby0",
+      "pic_email": "gslixby0@abc.net.au",
+      "pic_contact": "41141",
+      "address_company": "Manual - Credit Card",
+      "avatar": "10.png"
+    }
+  ]
+}
