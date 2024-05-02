@@ -28,16 +28,16 @@ class LicenseController extends Controller
         $expiredLicenses = License::where('expires_at', '<=', Carbon::now())->get();
 
         // Dapatkan lisensi yang dibuat pada tahun ini
-        $licensesThisYear = License::whereYear('purchase_date', Carbon::now()->year)->get();
+        $pendingLicenses = License::where('expires_at', null)->get();
 
         // Hitung jumlah lisensi aktif dan kadaluarsa
         $activeLicenseCount = $activeLicenses->count();
         $expiredLicenseCount = $expiredLicenses->count();
-        $licensesThisYearCount = $licensesThisYear->count();
+        $pendingLicensesCount = $pendingLicenses->count();
 
         return view('licenses.index', compact('licenses', 'license_count', 
         'activeLicenses', 'expiredLicenses', 'activeLicenseCount', 
-        'expiredLicenseCount', 'licensesThisYear', 'licensesThisYearCount', 'companies'));
+        'expiredLicenseCount', 'pendingLicenses', 'pendingLicensesCount', 'companies'));
     }
 
     public function generate(Request $request)
@@ -96,7 +96,6 @@ class LicenseController extends Controller
                     'license_key' => $license_key,
                     'purchase_date' => $purchase_date,
                     'valid_until' => $valid_until,
-                    'expires_at' => $expires_at,
                 ]);
             }
 
@@ -113,6 +112,7 @@ class LicenseController extends Controller
         // Validasi request
         $request->validate([
             'license' => 'required',
+            'serial_number' => 'required',
         ]);
 
         // Dapatkan lisensi dari request
@@ -137,17 +137,36 @@ class LicenseController extends Controller
             $license = License::where('license_key', $request->license)->first();
             // Jika lisensi tidak ditemukan, berikan respons bahwa lisensi tidak valid
             if (!$license) {
-                return response()->json(['message' => 'Invalid license key'], 404);
+                return response()->json(['valid' => false, 'active' => false], 200);
             } else {
-                // Periksa apakah lisensi masih aktif
-                if ($license->expires_at > now()) {
-                    return response()->json(['valid' => true, 'active' => true], 200);
+                // Periksa apakah lisensi sudah diaktifkan
+                if ($license->activation_at !== null) {
+                    // Periksa apakah lisensi masih aktif
+                    if ($license->expires_at > now()) {
+                        // Periksa apakah nomor seri cocok
+                        if ($license->serial_number === $request->serial_number) {
+                            return "1;" . $license->serial_number . ";" . $license->expires_at;
+                        } else {
+                            return "2;" . "SN not match" . ";" . $license->expires_at;
+                        }
+                    } else {
+                        return "0;" . "Expired" . ";" . $license->expires_at;
+                    }
                 } else {
-                    return response()->json(['valid' => true, 'active' => false], 200);
+                    // Jika lisensi belum diaktifkan, aktifkan dan atur tanggal kedaluwarsa
+                    $license->serial_number = $request->serial_number; // Ganti dengan nilai yang sesuai
+                    $license->activation_at = now();
+
+                    // Ubah string $license->purchase_date menjadi objek Carbon
+                    $purchaseDate = \Carbon\Carbon::parse($license->purchase_date);
+
+                    $license->expires_at = $purchaseDate->addDays($license->valid_until);
+                    $license->save();
+                    return "1;" . $license->serial_number . ";" . $license->expires_at;
                 }
             }
         } else {
-            return response()->json(['valid' => false, 'active' => false], 200); // Lisensi tidak valid
+            return "0;" . "License not found" . ";" . "1999-03-25 02:50:45"; // Lisensi tidak valid
         }
     }
 
@@ -167,6 +186,8 @@ class LicenseController extends Controller
                     'purchase_date' => $license->purchase_date,
                     'valid_until' => $license->valid_until,
                     'expires_at' => $license->expires_at,
+                    'activation_at' => $license->activation_at,
+                    'serial_number' => $license->serial_number,
                     'created_at' => $license->created_at,
                     'updated_at' => $license->updated_at
                 ];

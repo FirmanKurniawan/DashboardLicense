@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('license_key')->unique();
             $table->dateTime('purchase_date');
             $table->integer('valid_until');
-            $table->dateTime('expires_at');
+            $table->dateTime('expires_at')->nullable();
+            $table->dateTime('activation_at')->nullable();
+            $table->string('serial_number')->nullable();
             $table->timestamps();
         });
     }

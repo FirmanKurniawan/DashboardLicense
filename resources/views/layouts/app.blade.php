@@ -260,7 +260,7 @@
                     </ul>
                 </li>
                 <li class=" nav-item"><a class="d-flex align-items-center" href="{{ route('company.index') }}"><i data-feather="pocket"></i><span class="menu-title text-truncate" data-i18n="File Manager">Company</span></a>
-                    <li class=" nav-item"><a class="d-flex align-items-center" href="{{ route('order.index') }}"><i data-feather="dollar-sign"></i><span class="menu-title text-truncate" data-i18n="File Manager">Order</span></a>
+                    {{-- <li class=" nav-item"><a class="d-flex align-items-center" href="{{ route('order.index') }}"><i data-feather="dollar-sign"></i><span class="menu-title text-truncate" data-i18n="File Manager">Order</span></a> --}}
                 </li>
             </ul>
         </div>

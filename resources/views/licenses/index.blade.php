@@ -31,8 +31,8 @@
                         <div class="card">
                             <div class="card-body d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h3 class="fw-bolder mb-75">{{$licensesThisYearCount}}</h3>
-                                    <span>Paid Licenses</span>
+                                    <h3 class="fw-bolder mb-75">{{$pendingLicensesCount}}</h3>
+                                    <span>Pending Licenses</span>
                                 </div>
                                 <div class="avatar bg-light-danger p-50">
                                     <span class="avatar-content">
@@ -89,10 +89,12 @@
                                 <tr>
                                     <th></th>
                                     <th>License</th>
-                                    <th>Purchase</th>
-                                    <th>Status</th>
                                     <th>Valid</th>
+                                    <th>Status</th>
+                                    <th>Serial Number</th>
                                     <th>Expired</th>
+                                    <th>Activation</th>
+                                    <th>Purchase</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

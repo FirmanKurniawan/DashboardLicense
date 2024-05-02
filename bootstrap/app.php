@@ -12,8 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
-            'http://localhost:8000/license/generate',
-            'http://localhost:8000/license/verify',
+            'http://103.18.133.192:9002/license/generate',
+            'http://103.18.133.192:9002/license/verify',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

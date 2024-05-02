@@ -45,17 +45,19 @@ $(function () {
   if (dtUserTable.length) {
     dtUserTable.DataTable({
       ajax: {
-        url: 'http://localhost:8000/license/list', // Ganti dengan URL API Anda
+        url: 'http://103.18.133.192:9002/license/list', // Ganti dengan URL API Anda
         dataSrc: 'data' // Menentukan sumber data dalam respons JSON
       },
       columns: [
         // columns according to JSON
         { data: '' },
         { data: 'license_key' },
-        { data: 'purchase_date' },
         { data: 'valid_until' },
         { data: 'status' },
+        { data: 'serial_number' },
         { data: 'expires_at' },
+        { data: 'activation_at' },
+        { data: 'purchase_date' },
         { data: '' }
       ],
       columnDefs: [
@@ -120,7 +122,7 @@ $(function () {
           // User Role
           targets: 2,
           render: function (data, type, full, meta) {
-            var $role = full['purchase_date'];
+            var $role = full['valid_until'];
             return "<span class='text-truncate align-middle'>" + $role + '</span>';
           }
         },
@@ -132,7 +134,10 @@ $(function () {
               var statusClass = '';
       
               // Memeriksa apakah tanggal kadaluarsa sudah melewati tanggal saat ini
-              if (new Date($status) < new Date()) {
+              if (!$status) {
+                  $status = 'Pending';
+                  statusClass = 'badge-light-warning';
+              } else if (new Date($status) < new Date()) {
                   $status = 'Inactive';
                   statusClass = 'badge-light-secondary';
               } else {
@@ -152,9 +157,37 @@ $(function () {
         {
           targets: 4,
           render: function (data, type, full, meta) {
-            var $billing = full['valid_until'];
-
-            return '<span class="text-nowrap">' + $billing + '</span>';
+              var $billing = full['serial_number'];
+      
+              if ($billing === null) {
+                  return '<span class="text-nowrap">-</span>';
+              } else {
+                  return '<span class="text-nowrap">' + $billing + '</span>';
+              }
+          }
+        },
+        {
+          targets: 5,
+          render: function (data, type, full, meta) {
+              var $billing = full['expires_at'];
+      
+              if ($billing === null) {
+                  return '<span class="text-nowrap">-</span>';
+              } else {
+                  return '<span class="text-nowrap">' + $billing + '</span>';
+              }
+          }
+        },
+        {
+          targets: 6,
+          render: function (data, type, full, meta) {
+              var $billing = full['activation_at'];
+      
+              if ($billing === null) {
+                  return '<span class="text-nowrap">-</span>';
+              } else {
+                  return '<span class="text-nowrap">' + $billing + '</span>';
+              }
           }
         },
         {
@@ -269,7 +302,7 @@ $(function () {
           type: 'column',
           renderer: function (api, rowIdx, columns) {
             var data = $.map(columns, function (col, i) {
-              return col.columnIndex !== 6 // ? Do not show row in modal popup if title is blank (for check box)
+              return col.columnIndex !== 9 // ? Do not show row in modal popup if title is blank (for check box)
                 ? '<tr data-dt-row="' +
                     col.rowIdx +
                     '" data-dt-column="' +
@@ -315,6 +348,7 @@ $(function () {
           // Adding options for select dropdown
           select.append('<option value="Active" class="text-capitalize">Active</option>');
           select.append('<option value="Inactive" class="text-capitalize">Inactive</option>');
+          select.append('<option value="Pending" class="text-capitalize">Pending</option>');
         });
       }
     });
